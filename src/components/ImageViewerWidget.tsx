@@ -1,10 +1,14 @@
 import React, { useEffect, useRef } from 'react';
 import { WidgetModelContext } from '../models/model';
 import { WidgetModel } from '@jupyter-widgets/base';
-import { createGlobalStateHook } from '../utils/global-states';
+// import { createGlobalStateHook } from '../utils/global-states';
 import { useModelState } from '../models/image-viewer-model';
+/*
 import useZoomPan, { Transform } from '../utils/zoom-pan-context';
 import { ORIGIN, Point } from '../utils/point';
+ */
+import useZoomPan from '../utils/zoom-pan-context';
+import { Point } from '../utils/point';
 import useEventListener from '../utils/event-listener';
 import {
   Divider,
@@ -31,7 +35,7 @@ import '../../css/ImageViewerWidger.css';
 interface WidgetProps {
   model: WidgetModel;
 }
-
+/*
 interface VisibleArea {
   topLeft: Point;
   bottomRight: Point;
@@ -41,6 +45,7 @@ const useSharedVisibleArea = createGlobalStateHook<VisibleArea>({
   topLeft: ORIGIN,
   bottomRight: new Point(1, 1),
 });
+*/
 
 function ImageViewerWidget(props: WidgetProps) {
   // --- STATES ---
@@ -49,18 +54,18 @@ function ImageViewerWidget(props: WidgetProps) {
   const [width] = useModelState('_width');
   const [height] = useModelState('_height');
 
-  const [modelCenter, setModelCenter] = useModelState('center');
-  const [modelScale, setScaleCenter] = useModelState('scale');
+  /*
+const [modelCenter, setModelCenter] = useModelState('center');
+const [modelScale, setScaleCenter] = useModelState('scale');
 
-  // sharedCenter -> modelCenter -> center
-
-  const [linkedTransform, setLinkedTransform] =
-    useModelState('linkedTransform');
-  let sharedTransform = null;
-  if (linkedTransform) {
-    sharedTransform = useSharedVisibleArea();
-  }
-
+// sharedCenter -> modelCenter -> center
+const [linkedTransform, setLinkedTransform] =
+  useModelState('linkedTransform');
+let sharedTransform = null;
+if (linkedTransform) {
+  sharedTransform = useSharedVisibleArea();
+}
+*/
   const [
     transform,
     startPan,
@@ -83,8 +88,9 @@ function ImageViewerWidget(props: WidgetProps) {
     }
     e.preventDefault();
     const bounds = ref.current.getBoundingClientRect();
+    console.log(e.deltaY, e.deltaMode);
     zoom(
-      -e.deltaY / 30,
+      -e.deltaY / 100,
       new Point(e.clientX - bounds.left, e.clientY - bounds.top)
     );
   });

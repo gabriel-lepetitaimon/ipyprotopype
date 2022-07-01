@@ -5,10 +5,11 @@ import {
   useEffect,
   useState,
   useRef,
-  useReducer,
+  // useReducer,
 } from 'react';
 
-import { ORIGIN, Point } from './point';
+// import { ORIGIN, Point } from './point';
+import { Point } from './point';
 import useSize from './size-context';
 //import useEventListener from "./event-listener";
 
@@ -193,7 +194,7 @@ export default function useZoomPan(
     mouseOut,
   ];
 }
-
+/*
 // -----
 const constraintScale = (scale: number, state: ZoomAreaState): number => {
   return Math.min(Math.max(scale, state.minScale), state.maxScale);
@@ -212,7 +213,7 @@ const constraintCenter = (
   );
   return { scale: transform.scale, center: center };
 };
-
+/*
 const applyZoom = (
   t: Transform,
   logDelta: number,
@@ -240,22 +241,23 @@ interface ZoomAreaState {
 }
 
 export function manageZoomArea(
-  transform: Transform,
+  transformIni: Transform,
   setTransform: (t: Transform) => void
 ) {
-  [transform, dispatch] = useReducer(
-    (t: Transform, action: TransformAction) => {
+  const [transform, dispatch] = useReducer(
+    (t: Transform, action: TransformAction): Transform => {
       if ('transform' in action) {
         return action.transform;
       } else if ('zoom' in action) {
-        return;
+        return applyZoom(t, action.zoom, , action.zoomCenter);
       }
+      return t;
     },
     { center: ORIGIN, scale: 0 }
   );
-  return {transform: transform, dispatch: dispatch}
+  return { transform: transform, dispatch: dispatch };
 }
-
+*/
 interface SetTransform {
   transform: Transform;
 }
