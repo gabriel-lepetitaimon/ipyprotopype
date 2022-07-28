@@ -3,14 +3,16 @@ import { MODULE_NAME, MODULE_VERSION } from '../version';
 import { useState } from 'react';
 import { useModel, useModelEvent } from './model';
 import { ORIGIN, Point } from '../utils/point';
+import { Transform } from '../utils/zoom-pan-handler';
+
+// import { JupyterLab } from '@jupyterlab/application';
 
 // Your widget state goes here. Make sure to update the corresponding
 // Python state in viewer.py
 
 const defaultImageViewerModelState = {
   _data: 'default',
-  _width: 0,
-  _height: 0,
+  _size: ORIGIN,
   linkedTransform: false,
   center: ORIGIN,
   scale: 0,
@@ -35,7 +37,17 @@ export class ImageViewerModel extends DOMWidgetModel {
   static serializers: ISerializers = {
     ...DOMWidgetModel.serializers,
     _data: { deserialize: deserialize_bytes },
-    center: {
+    _transform: {
+      deserialize: (t: Array<number>): Transform => {
+        return { center: new Point(t[0], t[1]), zoom: t[2] };
+      },
+      serialize: (t: Transform): Array<number> => [
+        t.center.x,
+        t.center.y,
+        t.zoom,
+      ],
+    },
+    _size: {
       deserialize: (p: Array<number>): Point => new Point(p[0], p[1]),
       serialize: (p: Point): Array<number> => [p.x, p.y],
     },

@@ -32,11 +32,14 @@ class ImageViewer(DOMWidget):
     _data = Bytes(b'data:image/png;base64,'
                   b'BORw0KGgoAAAANSUhEUgAAAAEAAAABCAAAAAA6fptVAAAACklEQVQIHWNgAAAAAgABz8g15QAAAABJRU5ErkJggg='
                 ).tag(sync=True, )
-    _height = Int(1).tag(sync=True)
-    _width = Int(1).tag(sync=True)
-    center = Tuple(trait=(int, int)).tag(sync=True)
-    scale = Float(0).tag(sync=True)
+    _size = Tuple(trait=(int, int)).tag(sync=True)
+    _transform = Tuple((0, 0, 1e-8), trait=(float, float, float)).tag(sync=True)
     linkedTransform = Bool(False).tag(sync=True)
+
+    def goto(self, pos, scale=None):
+        if scale is None:
+            scale = self._transform[-1]
+        self._transform = (pos[0], pos[1], scale)
 
     @property
     def image(self):
@@ -47,8 +50,7 @@ class ImageViewer(DOMWidget):
         png = ImageViewer._img2url(img)
         self.png = png
         self._data = png
-        self._height = img.shape[-2]
-        self._width = img.shape[-1]
+        self._size = img.shape[-2:]
 
     @staticmethod
     def _img2url(img, normalize=False, normalize_img=None, thumbnail=None, keep_ratio=True, format='png'):

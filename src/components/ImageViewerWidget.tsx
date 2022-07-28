@@ -1,15 +1,12 @@
-import React, { useEffect, useRef } from 'react';
-import { WidgetModelContext } from '../models/model';
+import React, { useRef } from 'react';
+import { useModelEvent, WidgetModelContext } from '../models/model';
 import { WidgetModel } from '@jupyter-widgets/base';
-// import { createGlobalStateHook } from '../utils/global-states';
 import { useModelState } from '../models/image-viewer-model';
-/*
-import useZoomPan, { Transform } from '../utils/zoom-pan-context';
-import { ORIGIN, Point } from '../utils/point';
- */
-import useZoomPan from '../utils/zoom-pan-context';
+import {
+  useSceneMouseEventListener,
+  useZoomTransform,
+} from '../utils/zoom-pan-handler';
 import { Point } from '../utils/point';
-import useEventListener from '../utils/event-listener';
 import {
   Divider,
   IconButton,
@@ -35,84 +32,39 @@ import '../../css/ImageViewerWidger.css';
 interface WidgetProps {
   model: WidgetModel;
 }
-/*
-interface VisibleArea {
-  topLeft: Point;
-  bottomRight: Point;
-}
-
-const useSharedVisibleArea = createGlobalStateHook<VisibleArea>({
-  topLeft: ORIGIN,
-  bottomRight: new Point(1, 1),
-});
-*/
 
 function ImageViewerWidget(props: WidgetProps) {
   // --- STATES ---
   const ref = useRef<HTMLDivElement | null>(null);
   const [img] = useModelState('_data');
-  const [width] = useModelState('_width');
-  const [height] = useModelState('_height');
+  const [imgSize] = useModelState('_size');
 
-  /*
-const [modelCenter, setModelCenter] = useModelState('center');
-const [modelScale, setScaleCenter] = useModelState('scale');
+  const zoomTransform = useZoomTransform(ref, imgSize, 25);
+  const cursorPos = useSceneMouseEventListener(zoomTransform);
 
-// sharedCenter -> modelCenter -> center
-const [linkedTransform, setLinkedTransform] =
-  useModelState('linkedTransform');
-let sharedTransform = null;
-if (linkedTransform) {
-  sharedTransform = useSharedVisibleArea();
-}
-*/
-  const [
-    transform,
-    startPan,
-    zoom,
-    setSceneSize,
-    updateTransform,
-    cursorPos,
-    zoomMouseMove,
-    zoomMouseOut,
-  ] = useZoomPan(ref, new Point(width, height), 25);
-
-  useEffect(() => {
-    setSceneSize(new Point(width, height));
-  }, [width, height]);
-
-  // --- EVENTS ---
-  useEventListener(ref, 'wheel', (e) => {
-    if (ref.current === null) {
-      return;
-    }
-    e.preventDefault();
-    const bounds = ref.current.getBoundingClientRect();
-    console.log(e.deltaY, e.deltaMode);
-    zoom(
-      -e.deltaY / 100,
-      new Point(e.clientX - bounds.left, e.clientY - bounds.top)
-    );
+  useModelEvent('change:_transform', (model) => {
+    zoomTransform.dispatch({
+      transform: model.get('_transform'),
+      animation: { duration: 500 },
+    });
   });
 
   const panHorizontally = (delta: number): void => {
-    updateTransform((t) => {
-      t.center.x += delta;
-      return t;
+    zoomTransform.dispatch({
+      pan: new Point(delta, 0),
     });
   };
 
   const panVertically = (delta: number): void => {
-    updateTransform((t) => {
-      t.center.y += delta;
-      return t;
+    zoomTransform.dispatch({
+      pan: new Point(0, delta),
     });
   };
 
   // --- STYLE ---
   const rulerProps = {
     thickness: 15,
-    scale: transform.scale,
+    scale: zoomTransform.scale,
   };
 
   const widgetStyle: React.CSSProperties = {
@@ -122,56 +74,47 @@ if (linkedTransform) {
   };
 
   const sceneStyle: React.CSSProperties = {
-    width: `${width * transform.scale}px`,
-    height: `${height * transform.scale}px`,
+    width: `${imgSize.x * zoomTransform.scale}px`,
+    height: `${imgSize.y * zoomTransform.scale}px`,
     position: 'absolute',
-    left: `calc(50% ${transform.center.x < 0 ? '+' : '-'} ${
-      Math.abs(transform.center.x) * transform.scale
+    left: `calc(50% ${zoomTransform.center.x < 0 ? '+' : '-'} ${
+      Math.abs(zoomTransform.center.x) * zoomTransform.scale
     }px)`,
-    top: `calc(50% ${transform.center.y < 0 ? '+' : '-'} ${
-      Math.abs(transform.center.y) * transform.scale
+    top: `calc(50% ${zoomTransform.center.y < 0 ? '+' : '-'} ${
+      Math.abs(zoomTransform.center.y) * zoomTransform.scale
     }px)`,
   };
 
   const imgStyle: React.CSSProperties = {
-    // transform: `scale(${transform.scale})`,
-    // transformOrigin: '0 0',
     width: '100%',
     height: '100%',
-    imageRendering: transform.scale < 12 ? 'auto' : 'pixelated',
+    imageRendering: zoomTransform.scale < 12 ? 'auto' : 'pixelated',
   };
 
   // --- RENDER ---
   return (
     <div className="ImageViewerWidget" style={widgetStyle}>
-      <></>
-      <Settings thickeness={rulerProps.thickness} />
+      <Settings thickness={rulerProps.thickness} />
       <RulerAxis
         orientation={'horizontal'}
-        center={transform.center.x}
+        center={zoomTransform.center.x}
         cursorPos={cursorPos?.x}
         onPanCenter={panHorizontally}
-        domain={width}
+        domain={imgSize.x}
         style={{ gridRow: 1, gridColumn: 2 }}
         {...rulerProps}
       />
       <RulerAxis
         orientation={'vertical'}
-        center={transform.center.y}
+        center={zoomTransform.center.y}
         cursorPos={cursorPos?.y}
         onPanCenter={panVertically}
-        domain={height}
+        domain={imgSize.y}
         style={{ gridRow: 2, gridColumn: 1 }}
         {...rulerProps}
       />
 
-      <div
-        ref={ref}
-        onMouseDownCapture={startPan}
-        onMouseMove={zoomMouseMove}
-        onMouseOut={zoomMouseOut}
-        style={{ gridRow: 2, gridColumn: 2, cursor: 'crosshair' }}
-      >
+      <div ref={ref} style={{ gridRow: 2, gridColumn: 2, cursor: 'crosshair' }}>
         <div className={'ImageViewport'}>
           <div style={sceneStyle}>
             <img src={img} style={imgStyle} className="undraggable" />
@@ -183,12 +126,12 @@ if (linkedTransform) {
 }
 
 interface SettingsProps {
-  thickeness: number;
+  thickness: number;
 }
 
 function Settings(props: SettingsProps) {
   const settingsIconStyle: React.CSSProperties = {
-    height: props.thickeness - 2,
+    height: props.thickness - 2,
     color: 'var(--jp-inverse-layout-color3)',
   };
 
