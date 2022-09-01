@@ -1,17 +1,44 @@
 import { Point, Rect } from './point';
 
+interface AnimatorOptions<K extends string> {
+  animations?: Record<K, Animation<AnimableTypes>>;
+  duration?: number;
+  freq?: number;
+  onStart?: (animator: Animator<K>) => void;
+  onPause?: (animator: Animator<K>) => void;
+  onStop?: (animator: Animator<K>) => void;
+}
+
 export class Animator<K extends string> {
   public t = 0;
+  protected animations?: Record<K, Animation<AnimableTypes>>;
+  protected _duration = 750;
+  protected _freq = 60;
   protected dt;
   protected timer: ReturnType<typeof setInterval> | null = null;
   protected delayTimer: ReturnType<typeof setTimeout> | null = null;
+  protected onStart?: (animator: Animator<K>) => void;
+  protected onPause?: (animator: Animator<K>) => void;
+  protected onStop?: (animator: Animator<K>) => void;
 
   constructor(
     protected callback: (t: Record<K, AnimableTypes>) => void,
-    protected animations?: Record<K, Animation<AnimableTypes>>,
-    protected _duration = 750,
-    protected _freq = 60
+    opt?: AnimatorOptions<K>
   ) {
+    if (opt) {
+      this.animations = opt?.animations;
+      this.onStart = opt.onStart;
+      this.onPause = opt.onPause;
+      this.onStop = opt.onStop;
+
+      if (opt.duration !== undefined) {
+        this._duration = opt.duration;
+      }
+      if (opt.freq !== undefined) {
+        this._freq = opt.freq;
+      }
+    }
+
     this.dt = this._duration / this._freq;
   }
 
@@ -77,6 +104,9 @@ export class Animator<K extends string> {
       return;
     }
 
+    if (this.onStart) {
+      this.onStart(this);
+    }
     this.timer = setInterval(() => {
       this.t += this.dt;
       if (this.t < this._duration) {
@@ -102,6 +132,9 @@ export class Animator<K extends string> {
     if (this.timer !== null) {
       clearInterval(this.timer);
       this.timer = null;
+      if (this.onPause) {
+        this.onPause(this);
+      }
     } else if (this.delayTimer !== null) {
       clearTimeout(this.delayTimer);
       this.delayTimer = null;
@@ -109,8 +142,15 @@ export class Animator<K extends string> {
   }
 
   stop(): void {
-    if (this.running) {
-      this.pause();
+    if (this.timer !== null) {
+      clearInterval(this.timer);
+      this.timer = null;
+    } else if (this.delayTimer !== null) {
+      clearTimeout(this.delayTimer);
+      this.delayTimer = null;
+    }
+    if (this.onStop) {
+      this.onStop(this);
     }
     this.t = 0;
   }

@@ -11,6 +11,7 @@ import { Transform } from '../utils/zoom-pan-handler';
 // Python state in viewer.py
 
 const defaultImageViewerModelState = {
+  _instance_id: 0,
   _data: 'default',
   _size: ORIGIN,
   linkedTransform: false,

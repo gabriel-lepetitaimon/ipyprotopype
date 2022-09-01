@@ -14,18 +14,12 @@ TODO: Add module docstring
 
 from ipywidgets import DOMWidget
 from traitlets import Bool, Bytes, Float, Int, Tuple, Unicode
-from ._frontend import module_name, module_version
+from ._frontend import BaseI3PWidget
 
 
-class ImageViewer(DOMWidget):
+class ImageViewer(BaseI3PWidget):
     """TODO: Add docstring here
     """
-    _model_name = Unicode('ImageViewerModel').tag(sync=True)
-    _model_module = Unicode(module_name).tag(sync=True)
-    _model_module_version = Unicode(module_version).tag(sync=True)
-    _view_name = Unicode('ImageViewer').tag(sync=True)
-    _view_module = Unicode(module_name).tag(sync=True)
-    _view_module_version = Unicode(module_version).tag(sync=True)
 
     # Your widget state goes here. Make sure to update the corresponding
     # JavaScript widget state (defaultModelProperties) in widgets.ts
