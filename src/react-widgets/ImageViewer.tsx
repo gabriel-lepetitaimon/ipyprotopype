@@ -1,7 +1,7 @@
 import React, { useMemo, useRef } from 'react';
-import { useModelEvent, WidgetModelContext } from '../models/model';
+import { useModelEvent, WidgetModelContext } from '../ipywidgets/base-model';
 import { WidgetModel } from '@jupyter-widgets/base';
-import { useModelState } from '../models/image-viewer-model';
+import { useModelState } from '../ipywidgets/imageviewer';
 import {
   Transform,
   useSceneMouseEventListener,
@@ -25,7 +25,7 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import VerticalSplitIcon from '@mui/icons-material/VerticalSplit';
 import { ThemeProvider } from '@mui/material/styles';
 
-import RulerAxis from './RulerAxis';
+import RulerAxis from '../react-components/RulerAxis';
 
 import { useTheme } from '../utils/mui';
 import '../../css/ImageViewerWidger.css';
@@ -56,7 +56,7 @@ const useStore = instantiatedStore(() =>
   )
 );
 
-function ImageViewerWidget(props: WidgetProps) {
+function ImageViewer(props: WidgetProps) {
   // --- STATES ---
   const ref = useRef<HTMLDivElement | null>(null);
   const [img] = useModelState('_data');
@@ -268,4 +268,4 @@ function withModelContext(Component: (props: WidgetProps) => JSX.Element) {
   );
 }
 
-export default withModelContext(ImageViewerWidget);
+export default withModelContext(ImageViewer);

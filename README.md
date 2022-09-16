@@ -1,4 +1,4 @@
-
+ 
 # ipyprotopypes
 
 [![Build Status](https://travis-ci.org//ipyprotopypes.svg?branch=master)](https://travis-ci.org//ipyprotopypes)
@@ -18,7 +18,7 @@ pip install ipyprotopypes
 If you are using Jupyter Notebook 5.2 or earlier, you may also need to enable
 the nbextension:
 ```bash
-jupyter nbextension enable --py [--sys-prefix|--user|--system] ipyprotopypes
+jupyter nbextension enable --py [--sys-prefix|--user|--system] ipyprotopypes jupyter_packaging 
 ```
 
 ## Development Installation
@@ -29,17 +29,23 @@ conda create -n ipyprotopypes-dev -c conda-forge nodejs yarn python jupyterlab
 conda activate ipyprotopypes-dev
 ```
 
-Install the python. This will also build the TS package.
+Install the javascript dependencies.
+```bash
+yarn install
+```
+
+Install the python package. This will also build the TS package.
 ```bash
 pip install -e ".[test, examples]"
 ```
+
 
 When developing your extensions, you need to manually enable your extensions with the
 notebook / lab frontend. For lab, this is done by the command:
 
 ```
 jupyter labextension develop --overwrite .
-yarn run build
+jlpm build
 ```
 
 For classic notebook, you need to run:
@@ -61,9 +67,9 @@ terminals to watch for changes in the extension's source and automatically rebui
 
 ```bash
 # Watch the source directory in one terminal, automatically rebuilding when needed
-yarn run watch
+jlpm watch
 # Run JupyterLab in another terminal
-jupyter lab
+jupyter-lab --watch
 ```
 
 After a change wait for the build to finish and then refresh your browser and the changes should take effect.

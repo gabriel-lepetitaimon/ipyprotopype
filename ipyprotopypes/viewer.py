@@ -22,7 +22,7 @@ class ImageViewer(BaseI3PWidget):
     """
 
     # Your widget state goes here. Make sure to update the corresponding
-    # JavaScript widget state (defaultModelProperties) in widgets.ts
+    # JavaScript widget state (defaultModelProperties) in ipywidgets.ts
     _data = Bytes(b'data:image/png;base64,'
                   b'BORw0KGgoAAAANSUhEUgAAAAEAAAABCAAAAAA6fptVAAAACklEQVQIHWNgAAAAAgABz8g15QAAAABJRU5ErkJggg='
                 ).tag(sync=True, )

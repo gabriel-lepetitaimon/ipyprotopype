@@ -33,7 +33,7 @@ extensions = [
     'nbsphinx_link',
 ]
 
-# Set the nbsphinx JS path to empty to avoid showing twice of the widgets
+# Set the nbsphinx JS path to empty to avoid showing twice of the ipywidgets
 nbsphinx_requirejs_path = ""
 nbsphinx_widgets_path = ""
 

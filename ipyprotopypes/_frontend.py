@@ -8,7 +8,7 @@ from ipywidgets import DOMWidget
 from traitlets import Unicode, Int
 
 """
-Information about the frontend package of the widgets.
+Information about the frontend package of the ipywidgets.
 """
 
 module_name = "ipyprotopypes"

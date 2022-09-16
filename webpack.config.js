@@ -71,7 +71,7 @@ module.exports = [
   /**
    * Documentation widget bundle
    *
-   * This bundle is used to embed widgets in the package documentation.
+   * This bundle is used to embed ipywidgets in the package documentation.
    */
   {
     entry: './src/index.ts',

@@ -69,7 +69,7 @@ export class DummyManager extends widgets.ManagerBase<HTMLElement> {
     moduleName: string,
     moduleVersion: string
   ): Promise<any> {
-    if (moduleName === '@jupyter-widgets/base') {
+    if (moduleName === '@jupyter-ipywidgets/base') {
       if ((widgets as any)[className]) {
         return Promise.resolve((widgets as any)[className]);
       } else {

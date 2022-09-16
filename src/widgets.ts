@@ -4,8 +4,5 @@
 // Import the CSS
 import '../css/widget.css';
 
-// Import models
-export { ImageViewerModel } from './models/image-viewer-model';
-
-// Import widgets
-export * from './widgets/imageviewer';
+// Import ipywidgets
+export { ImageViewer, ImageViewerModel } from './ipywidgets/imageviewer';
