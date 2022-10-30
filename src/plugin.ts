@@ -10,6 +10,7 @@ import { IJupyterWidgetRegistry } from '@jupyter-widgets/base';
 import * as widgetExports from './widgets';
 
 import { MODULE_NAME, MODULE_VERSION } from './version';
+import { initializeJApp } from './ipywidgets/jbasewidget';
 
 const EXTENSION_ID = 'ipyprotopypes:plugin';
 
@@ -34,9 +35,13 @@ function activateWidgetExtension(
   app: Application<Widget>,
   registry: IJupyterWidgetRegistry
 ): void {
+  initializeJApp(app);
+
   registry.registerWidget({
     name: MODULE_NAME,
     version: MODULE_VERSION,
     exports: widgetExports,
   });
+  console.log('app', app);
+  console.log('registry', registry);
 }

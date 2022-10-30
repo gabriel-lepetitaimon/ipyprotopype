@@ -7,17 +7,13 @@
 import cv2
 import numpy as np
 import base64
-
-"""
-TODO: Add module docstring
-"""
-
-from ipywidgets import DOMWidget
 from traitlets import Bool, Bytes, Float, Int, Tuple, Unicode
 from ._frontend import BaseI3PWidget
 
+from .utils import EventsDispatcher
 
-class ImageViewer(BaseI3PWidget):
+
+class JImageViewer(BaseI3PWidget):
     """TODO: Add docstring here
     """
 
@@ -30,6 +26,15 @@ class ImageViewer(BaseI3PWidget):
     _transform = Tuple((0, 0, 1e-8), trait=(float, float, float)).tag(sync=True)
     linkedTransform = Bool(False).tag(sync=True)
 
+    def __init__(self):
+        super(JImageViewer, self).__init__()
+        self.on_click = EventsDispatcher()
+
+    def on_events(self, event, data):
+        match event:
+            case 'onclick':
+                self.on_click.dispatch(**data)
+
     def goto(self, pos, scale=None):
         if scale is None:
             scale = self._transform[-1]
@@ -41,7 +46,7 @@ class ImageViewer(BaseI3PWidget):
 
     @image.setter
     def image(self, img):
-        png = ImageViewer._img2url(img)
+        png = JImageViewer._img2url(img)
         self.png = png
         self._data = png
         self._size = img.shape[-2:]

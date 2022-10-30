@@ -6,20 +6,20 @@
 
 import { createTestModel } from './utils';
 
-import { ImageViewerModel } from '..';
+import { JImageViewerModel } from '..';
 
 describe('Example', () => {
   describe('ExampleModel', () => {
     it('should be createable', () => {
-      const model = createTestModel(ImageViewerModel);
-      expect(model).toBeInstanceOf(ImageViewerModel);
+      const model = createTestModel(JImageViewerModel);
+      expect(model).toBeInstanceOf(JImageViewerModel);
       expect(model.get('value')).toEqual('Hello World');
     });
 
     it('should be createable with a value', () => {
       const state = { value: 'Foo Bar!' };
-      const model = createTestModel(ImageViewerModel, state);
-      expect(model).toBeInstanceOf(ImageViewerModel);
+      const model = createTestModel(JImageViewerModel, state);
+      expect(model).toBeInstanceOf(JImageViewerModel);
       expect(model.get('value')).toEqual('Foo Bar!');
     });
   });

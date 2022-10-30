@@ -1,8 +1,9 @@
 import React, { useMemo, useRef } from 'react';
-import { useModelEvent, WidgetModelContext } from '../ipywidgets/base-model';
+import { useModelEvent, WidgetModelContext } from '../ipywidgets/jbasewidget';
 import { WidgetModel } from '@jupyter-widgets/base';
-import { useModelState } from '../ipywidgets/imageviewer';
+import { JImageViewerModel } from '../ipywidgets/JImageViewer';
 import {
+  SceneMouseEvent,
   Transform,
   useSceneMouseEventListener,
   useZoomTransform,
@@ -32,10 +33,18 @@ import '../../css/ImageViewerWidger.css';
 import { Observable } from 'rxjs';
 import create from 'zustand';
 import { subscribeWithSelector } from 'zustand/middleware';
-import { instantiatedStore, synchronizeStates } from '../utils/zustand-utils';
+import {
+  instantiatedStore,
+  synchronizableStates,
+} from '../utils/zustand-utils';
+
+interface EventsHandler {
+  onClick?: (ev: SceneMouseEvent) => void;
+}
 
 interface WidgetProps {
   model: WidgetModel;
+  events?: EventsHandler;
 }
 
 interface WidgetState {
@@ -44,7 +53,7 @@ interface WidgetState {
 
 const useStore = instantiatedStore(() =>
   create<WidgetState>()(
-    synchronizeStates(
+    synchronizableStates(
       subscribeWithSelector(() => ({
         transform: {
           center: new Point(0.5, 0.5),
@@ -59,9 +68,9 @@ const useStore = instantiatedStore(() =>
 function ImageViewer(props: WidgetProps) {
   // --- STATES ---
   const ref = useRef<HTMLDivElement | null>(null);
-  const [img] = useModelState('_data');
-  const [imgSize] = useModelState('_size');
-  const [instanceID] = useModelState('_instance_id');
+  const [img] = JImageViewerModel.use('_data');
+  const [imgSize] = JImageViewerModel.use('_size');
+  const [instanceID] = JImageViewerModel.use('_instance_id');
   const store = useStore(instanceID);
 
   const syncTransform: [Observable<Transform>, (t: Transform) => void] =
@@ -86,8 +95,12 @@ function ImageViewer(props: WidgetProps) {
       return [observable, observer];
     }, []);
 
+  const userEvents = {
+    onClick: props.events?.onClick,
+  };
+
   const zoomTransform = useZoomTransform(ref, imgSize, 25, syncTransform);
-  const cursorPos = useSceneMouseEventListener(zoomTransform);
+  const cursorPos = useSceneMouseEventListener(zoomTransform, userEvents);
 
   useModelEvent('change:_transform', (model) => {
     zoomTransform.dispatch({

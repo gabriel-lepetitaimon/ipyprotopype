@@ -650,7 +650,7 @@ export function useSceneMouseEventListener(
 
   // --- Default Zoom events Handlers ---
   const events = useMemo(() => {
-    const events: MouseEventsListener = userEvents || {};
+    const events: MouseEventsListener = {};
 
     if (!userEvents?.onMouseDown) {
       events.onMouseDown = (ev, ctrls) => {
@@ -660,13 +660,12 @@ export function useSceneMouseEventListener(
         }
       };
     }
+
     events.onMouseMove = (ev, ctrls) => {
       if (ctrls.panning && ctrls.lastEvent) {
         ctrls.pan(ev.movement.neg());
       } else {
-        if (userEvents?.onMouseMove) {
-          userEvents.onMouseMove(ev, ctrls);
-        }
+        userEvents?.onMouseMove && userEvents.onMouseMove(ev, ctrls);
         if (hoverEvents) {
           setCursorPos(ev.cursor.floor());
         }
@@ -685,9 +684,9 @@ export function useSceneMouseEventListener(
       if (ctrls.panning) {
         ctrls.endPan();
       }
-      if (userEvents?.onMouseLeave) {
-        userEvents.onMouseLeave(ev, ctrls);
-      }
+
+      userEvents?.onMouseLeave && userEvents.onMouseLeave(ev, ctrls);
+
       if (hoverEvents) {
         setCursorPos(null);
       }
@@ -695,6 +694,8 @@ export function useSceneMouseEventListener(
     events.onClick = (ev, ctrls) => {
       if (ctrls.panning && ev.button === ctrls.initialEvent?.button) {
         ctrls.endPan();
+      } else {
+        userEvents?.onClick && userEvents.onClick(ev, ctrls);
       }
     };
 

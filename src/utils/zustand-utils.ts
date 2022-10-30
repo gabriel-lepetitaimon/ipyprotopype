@@ -81,7 +81,7 @@ const syncImpl: SyncMiddlewareImpl = (f) => (set, get, _store) => {
   return f(set, get, _store);
 };
 
-export const synchronizeStates = syncImpl as unknown as SyncMiddleware;
+export const synchronizableStates = syncImpl as unknown as SyncMiddleware;
 
 type SyncProps = [
   ['setSync', (syncKey: string | null) => void],

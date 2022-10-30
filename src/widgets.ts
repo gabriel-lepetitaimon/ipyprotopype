@@ -5,4 +5,4 @@
 import '../css/widget.css';
 
 // Import ipywidgets
-export { ImageViewer, ImageViewerModel } from './ipywidgets/imageviewer';
+export { JImageViewer, JImageViewerModel } from './ipywidgets/JImageViewer';

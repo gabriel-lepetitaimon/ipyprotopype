@@ -4,7 +4,7 @@
 # Copyright (c) Gabriel Lepetit-Aimon.
 # Distributed under the terms of the Modified BSD License.
 
-from .viewer import ImageViewer
+from .viewer import JImageViewer
 from ._version import __version__, version_info
 
 def _jupyter_labextension_paths():

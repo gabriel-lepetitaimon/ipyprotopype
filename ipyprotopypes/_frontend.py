@@ -35,3 +35,11 @@ class BaseI3PWidget(DOMWidget):
 
     def __init__(self):
         super(BaseI3PWidget, self).__init__()
+        self.on_msg(self._on_custom_msg_received)
+
+    def _on_custom_msg_received(self, widget, content, buffer):
+        if content.get('event', None) and isinstance(content.get('data', None), dict):
+            self.on_events(content['event'], content['data'])
+
+    def on_events(self, event, data):
+        pass

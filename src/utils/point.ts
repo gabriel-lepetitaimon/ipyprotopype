@@ -93,9 +93,11 @@ export class Point {
   norm(): number {
     return Math.sqrt(this.x * this.x + this.y * this.y);
   }
+
+  static ORIGIN = Object.freeze(new Point(0, 0));
 }
 
-export const ORIGIN = Object.freeze(new Point(0, 0));
+export const ORIGIN = Point.ORIGIN;
 
 export class Rect {
   topLeft: Point;
